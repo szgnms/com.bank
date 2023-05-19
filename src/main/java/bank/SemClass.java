@@ -23,7 +23,7 @@ public class SemClass extends Thread {
         try {
            rs = Database.st.executeQuery("SELECT * FROM samTable WHERE name ='" + threadName + "'");
             while (rs.next()) {
-                System.out.println(rs.getString("name"));
+
                 semaphore.acquire();
                 System.out.println(threadName + "  Siraniz Geldi");
                 waiter(1);
@@ -31,8 +31,9 @@ public class SemClass extends Thread {
                 waiterDot(1);
                 System.out.println(threadName + "  islem tamamlandi");
                 semaphore.release();
-                System.out.println("test-----------------------------");
+
             }
+
         } catch (SQLException e) {
             System.out.println("------");
 
@@ -40,11 +41,10 @@ public class SemClass extends Thread {
             throw new RuntimeException(e);
         }
 
-        System.out.println();
 
     }
 
-    public void waiter(int timeout) {
+    public static void waiter(int timeout) {
 
         try {
             Thread.sleep(timeout * 1000L);
@@ -53,7 +53,7 @@ public class SemClass extends Thread {
         }
     }
 
-    public void waiterDot(int timeout) {
+    public static void waiterDot(int timeout) {
         for (int i = 0; i < 5; i++) {
 
             try {

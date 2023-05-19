@@ -14,12 +14,12 @@ import static bank.SemClass.rs;
 
 public class Methods {
     static Scanner scan = new Scanner(System.in);
-   static Semaphore smp= new Semaphore(3);
+    static Semaphore smp;
     static List<String> nameList = new ArrayList<>();
 
     static SemClass sem;
-    public static void createAccount() {
 
+    public static void createAccount() {
 
 
         System.out.println("Please enter name");
@@ -30,52 +30,53 @@ public class Methods {
         int id = scan.nextInt();
 
         Account account = new Account(name, surname, id);
-        sem=new SemClass(smp,2000,account.getName());
+        sem = new SemClass(smp, 2000, account.getName());
         nameList.add(sem.getName());
 
 
         try {
-            st.execute("INSERT INTO bank  values ("+"'"+account.getName()+"'"+", "+"'"+account.getSurname()+"'"+", "+account.getId()+ ")");
-        st.execute("INSERT INTO samTable Values("+"'"+sem.getSemaphore()+"'"+", "+sem.getDuration()+", "+"'"+sem.getThreadName()+"'"+")");
+            st.execute("INSERT INTO bank  values (" + "'" + account.getName() + "'" + ", " + "'" + account.getSurname() + "'" + ", " + account.getId() + ")");
+            st.execute("INSERT INTO samTable Values(" + "'" + sem.getSemaphore() + "'" + ", " + sem.getDuration() + ", " + "'" + sem.getThreadName() + "'" + ")");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         bankRun();
     }
 
-public static void bankRun()  {
-    System.out.println("Hosgeldiniz \n" +
-            "yapmak istediginiz islemi seciniz 1- kullanici kaydi 2- thread calistir");
-    String secim=scan.next();
-    switch(secim) {
-        case "1" : createAccount();
+    public   static void bankRun() {
 
-        case "2" : runThread();
+        System.out.println("Hosgeldiniz \n" +
+                "yapmak istediginiz islemi seciniz 1- kullanici kaydi 2- thread calistir");
+        String secim = scan.nextLine();
 
-        default:
-            System.out.println("yanlis giris");
-            bankRun();
+        switch (secim) {
+            case "1":
+                createAccount();
+            case "2":
+                runThread();
+                break;
+            default:
+                System.out.println("yanlis giris");
+                bankRun();
+
+        }
+
+
+    }
+
+    private   static void runThread() {
+        String thName = "Select name from samtable";
+        smp = new Semaphore(1);
+        try {
+            SemClass.waiter(1);
+            rs = st.executeQuery(thName);
+            while (rs.next()) {
+
+                sem = new SemClass(smp, 2000, rs.getString("name"));
+                sem.start();
+
 
             }
-
-
-
-}
-
-    private synchronized static void runThread() {
-         String thName="Select name from samtable";
-
-        try {
-          rs= st.executeQuery(thName);
-           while (rs.next()) {
-
-               sem=new SemClass(smp,2000, rs.getString("name"));
-               sem.start();
-           }
-
-
-
-            Methods.bankRun();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
