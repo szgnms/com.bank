@@ -62,16 +62,19 @@ public static void bankRun()  {
 
 }
 
-    private static void runThread() {
+    private synchronized static void runThread() {
          String thName="Select name from samtable";
 
         try {
-          ResultSet rs1= st.executeQuery(thName);
-           while (rs1.next()) {
+          rs= st.executeQuery(thName);
+           while (rs.next()) {
 
-               sem=new SemClass(smp,2000,rs1.getString("name"));
+               sem=new SemClass(smp,2000, rs.getString("name"));
                sem.start();
            }
+
+
+
             Methods.bankRun();
 
         } catch (SQLException e) {

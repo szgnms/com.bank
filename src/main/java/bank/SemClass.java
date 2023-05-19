@@ -18,25 +18,25 @@ public class SemClass extends Thread {
 
 
     @Override
-    public synchronized void run() {
-        ResultSet rs2;
-        try {
-            Methods.sem.semaphore.acquire();
-            rs2 = Database.st.executeQuery("SELECT * FROM bank WHERE name ='" + threadName + "'");
-            while (rs2.next()) {
-                System.out.println(rs2.getString("name"));
+    public void run() {
 
+        try {
+           rs = Database.st.executeQuery("SELECT * FROM samTable WHERE name ='" + threadName + "'");
+            while (rs.next()) {
+                System.out.println(rs.getString("name"));
+                semaphore.acquire();
                 System.out.println(threadName + "  Siraniz Geldi");
                 waiter(1);
                 System.out.println(threadName + "  islemler yapiliyor");
                 waiterDot(1);
                 System.out.println(threadName + "  islem tamamlandi");
-                Methods.sem.semaphore.release();
-        }
+                semaphore.release();
+                System.out.println("test-----------------------------");
+            }
         } catch (SQLException e) {
-
             System.out.println("------");
-        } catch (InterruptedException e) {
+
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
